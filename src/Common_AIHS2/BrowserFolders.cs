@@ -17,6 +17,7 @@ namespace BrowserFolders
         public const string Version = Constants.Version;
 
         internal static new ManualLogSource Logger { get; private set; }
+        public static AI_BrowserFolders Instance;
 
         private IFolderBrowser _sceneFolders;
         private IFolderBrowser _studioCharaFolders;
@@ -35,6 +36,7 @@ namespace BrowserFolders
         private void Awake()
         {
             Logger = base.Logger;
+            Instance = this;
 
             EnableMaker = Config.Bind("Main game", "Enable character folder browser in maker", true, "Changes take effect on game restart");
             if (!StudioAPI.InsideStudio && EnableMaker.Value) _makerCharaFolders = new MakerFolders();
