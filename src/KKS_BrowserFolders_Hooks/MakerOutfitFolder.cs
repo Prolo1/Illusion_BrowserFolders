@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using ChaCustom;
 using HarmonyLib;
-using KKAPI.Utilities;
 using Manager;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,8 +22,9 @@ namespace BrowserFolders.Hooks.KKS
 
 		public static string CurrentRelativeFolder => _folderTreeView?.CurrentRelativeFolder;
 
-		private static bool _refreshList;
-		private static string _targetScene;
+        private static bool _refreshList;
+        private static string _targetScene;
+        private Rect _windowRect;
 
 		public MakerOutfitFolders()
 		{
@@ -95,14 +95,19 @@ namespace BrowserFolders.Hooks.KKS
 							_refreshList = false;
 						}
 
-						var screenRect = new Rect((int)(Screen.width * 0.004), (int)(Screen.height * 0.57f), (int)(Screen.width * 0.125), (int)(Screen.height * 0.35));
-						IMGUIUtils.DrawSolidBox(screenRect);
-						GUILayout.Window(362, screenRect, TreeWindow, "Select outfit folder");
-						IMGUIUtils.EatInputInRect(screenRect);
-						guiShown = true;
-					}
-				}
-			}
+                        if (_windowRect.IsEmpty())
+                            _windowRect = new Rect((int)(Screen.width * 0.004), (int)(Screen.height * 0.57f), (int)(Screen.width * 0.125), (int)(Screen.height * 0.35));
+
+                        InterfaceUtils.DisplayFolderWindow(_folderTreeView, () => _windowRect, r => _windowRect = r, "Select outfit folder", OnFolderChanged, drawAdditionalButtons: () =>
+                        {
+                            if (Overlord.DrawDefaultCardsToggle())
+                                OnFolderChanged();
+                        });
+
+                        guiShown = true;
+                    }
+                }
+            }
 
 			if(!guiShown)
 			{
@@ -115,80 +120,11 @@ namespace BrowserFolders.Hooks.KKS
 		{
 			if(_customCoordinateFile == null) return;
 
-			var loadOutfitToggleIsOn = _loadOutfitToggle != null && _loadOutfitToggle.isOn;
-			if(loadOutfitToggleIsOn || _saveOutfitToggle != null && _saveOutfitToggle.isOn)
-			{
-				_customCoordinateFile.Initialize(loadOutfitToggleIsOn, false);
-			}
-		}
-
-		private static void TreeWindow(int id)
-		{
-			GUILayout.BeginVertical();
-			{
-				_folderTreeView.DrawDirectoryTree();
-
-				GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false));
-				{
-					if(Overlord.DrawDefaultCardsToggle())
-						OnFolderChanged();
-
-					if(GUILayout.Button("Refresh thumbnails"))
-					{
-						_folderTreeView.ResetTreeCache();
-						OnFolderChanged();
-					}
-
-					GUILayout.Space(1);
-
-					if(GUILayout.Button("Current folder"))
-						Utils.OpenDirInExplorer(_folderTreeView.CurrentFolder);
-					if(GUILayout.Button("Screenshot folder"))
-						Utils.OpenDirInExplorer(Path.Combine(Utils.NormalizePath(UserData.Path), "cap"));
-					if(GUILayout.Button("Main game folder"))
-						Utils.OpenDirInExplorer(Path.GetDirectoryName(Utils.NormalizePath(UserData.Path)));
-				}
-				GUILayout.EndVertical();
-			}
-			GUILayout.EndVertical();
-		}
-
-		[HarmonyPrefix]
-		[HarmonyPatch(typeof(Localize.Translate.Manager), nameof(Localize.Translate.Manager.CreateCoordinateInfo))]
-		private static bool FixedCreateCoordinateInfo(bool useDefaultData, ref Localize.Translate.Manager.ChaCoordinateInfo[] __result)
-		{
-
-			ChaFileCoordinate coordFileControl = new ChaFileCoordinate();
-			var fileInfo = Localize.Translate.Manager.DefaultData.UserDataAssist("coordinate/", useDefaultData);
-
-			//testing now			
-			List<ChaFileCoordinate> chaFileControls = new List<ChaFileCoordinate>();//seems to help with memory collection ¯\_(ツ)_/¯
-			var variables = fileInfo.Attempt((file) =>
-			{
-				bool flag = coordFileControl.LoadFile(file.info.FullPath);
-				if(flag)
-				{
-					chaFileControls.Add(new ChaFileCoordinate()
-					{
-						coordinateFileName = coordFileControl.coordinateFileName,
-						coordinateName = coordFileControl.coordinateName,
-						loadProductNo = coordFileControl.loadProductNo,
-						pngData= coordFileControl.pngData.ToArray(),//copy array
-					});
-					chaFileControls.Last().LoadBytes(coordFileControl.SaveBytes(), coordFileControl.loadVersion);
-					return new Localize.Translate.Manager.ChaCoordinateInfo(chaFileControls.Last(), file);
-				}
-
-				throw new Exception();
-			});
-			__result = variables.ToArray();
-
-
-			UnityEngine.Resources.UnloadUnusedAssets();
-			GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, false);
-
-			return false;
-		}
-
-	}
+            var loadOutfitToggleIsOn = _loadOutfitToggle != null && _loadOutfitToggle.isOn;
+            if (loadOutfitToggleIsOn || _saveOutfitToggle != null && _saveOutfitToggle.isOn)
+            {
+                _customCoordinateFile.Initialize(loadOutfitToggleIsOn, false);
+            }
+        }
+    }
 }

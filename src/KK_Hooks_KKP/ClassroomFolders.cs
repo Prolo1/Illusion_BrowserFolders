@@ -1,7 +1,6 @@
 ﻿using ActionGame;
 using HarmonyLib;
 using Illusion.Extensions;
-using KKAPI.Utilities;
 using Manager;
 using System.IO;
 using System.Linq;
@@ -15,8 +14,9 @@ namespace BrowserFolders.Hooks.KKP
 		private static FolderTreeView _folderTreeView;
 		public static string CurrentRelativeFolder => _folderTreeView?.CurrentRelativeFolder;
 
-		private static string _targetScene;
-		private static PreviewCharaList _customCharaFile;
+        private static string _targetScene;
+        private static PreviewCharaList _customCharaFile;
+        private Rect _windowRect;
 
 		public ClassroomFolders()
 		{
@@ -77,60 +77,33 @@ namespace BrowserFolders.Hooks.KKP
 			}
 		}
 
-		public void OnGui()
-		{
-			if(_customCharaFile != null && _customCharaFile.isVisible && _targetScene == Scene.Instance.AddSceneName)
-			{
-				var screenRect = GetFullscreenBrowserRect();
-				IMGUIUtils.DrawSolidBox(screenRect);
-				GUILayout.Window(362, screenRect, TreeWindow, "Select character folder");
-				IMGUIUtils.EatInputInRect(screenRect);
-			}
-			else
-			{
-				_folderTreeView?.StopMonitoringFiles();
-			}
-		}
+        public void OnGui()
+        {
+            if (_customCharaFile != null && _customCharaFile.isVisible && _targetScene == Scene.Instance.AddSceneName)
+            {
+                if (_windowRect.IsEmpty())
+                    _windowRect = GetFullscreenBrowserRect();
+
+                InterfaceUtils.DisplayFolderWindow(_folderTreeView, () => _windowRect, r => _windowRect = r, "Select character folder", OnFolderChanged, drawAdditionalButtons: () =>
+                {
+                    if (Overlord.DrawDefaultCardsToggle())
+                        OnFolderChanged();
+                });
+            }
+            else
+            {
+                _folderTreeView?.StopMonitoringFiles();
+            }
+        }
 
 		private static Rect GetFullscreenBrowserRect()
 		{
 			return new Rect((int)(Screen.width * 0.015), (int)(Screen.height * 0.35f), (int)(Screen.width * 0.16), (int)(Screen.height * 0.4));
 		}
 
-		private static void OnFolderChanged()
-		{
-			_customCharaFile.SafeProc(ccf => ccf.CharFile.SafeProc(cf => cf.Initialize()));
-		}
-
-		private static void TreeWindow(int id)
-		{
-			GUILayout.BeginVertical();
-			{
-				_folderTreeView.DrawDirectoryTree();
-
-				GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false));
-				{
-					if(Overlord.DrawDefaultCardsToggle())
-						OnFolderChanged();
-
-					if(GUILayout.Button("Refresh thumbnails"))
-					{
-						_folderTreeView.ResetTreeCache();
-						OnFolderChanged();
-					}
-
-					GUILayout.Space(1);
-
-					if(GUILayout.Button("Current folder"))
-						Utils.OpenDirInExplorer(_folderTreeView.CurrentFolder);
-					if(GUILayout.Button("Screenshot folder"))
-						Utils.OpenDirInExplorer(Path.Combine(Utils.NormalizePath(UserData.Path), "cap"));
-					if(GUILayout.Button("Main game folder"))
-						Utils.OpenDirInExplorer(Path.GetDirectoryName(Utils.NormalizePath(UserData.Path)));
-				}
-				GUILayout.EndVertical();
-			}
-			GUILayout.EndVertical();
-		}
-	}
+        private static void OnFolderChanged()
+        {
+            _customCharaFile.SafeProc(ccf => ccf.CharFile.SafeProc(cf => cf.Initialize()));
+        }
+    }
 }
