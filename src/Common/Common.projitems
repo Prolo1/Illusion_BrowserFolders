@@ -15,5 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)FolderTreeView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IFolderBrowser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WeakKeyDictionary.cs" />
   </ItemGroup>
 </Project>

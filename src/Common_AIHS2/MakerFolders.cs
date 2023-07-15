@@ -319,33 +319,35 @@ namespace BrowserFolders
 					{
 						text = "";
 					}
-					CustomCharaFileInfo customCharaFileInfo = new CustomCharaFileInfo();
-					int num = idx;
-					idx = num + 1;
-					customCharaFileInfo.index = num;
-					customCharaFileInfo.name = chaFileControl.parameter.fullname;
-					customCharaFileInfo.personality = text;
-					customCharaFileInfo.voice = chaFileControl.parameter2.personality;
-					customCharaFileInfo.height = chaFileControl.custom.GetHeightKind();
-					customCharaFileInfo.bustSize = chaFileControl.custom.GetBustSizeKind();
-					customCharaFileInfo.hair = chaFileControl.custom.hair.kind;
-					customCharaFileInfo.birthMonth = (int)chaFileControl.parameter.birthMonth;
-					customCharaFileInfo.birthDay = (int)chaFileControl.parameter.birthDay;
-					customCharaFileInfo.strBirthDay = ChaFileDefine.GetBirthdayStr((int)chaFileControl.parameter.birthMonth, (int)chaFileControl.parameter.birthDay, Singleton<GameSystem>.Instance.language);
-					customCharaFileInfo.sex = (int)chaFileControl.parameter.sex;
-					customCharaFileInfo.FullPath = folderAssist.lstFile[i].FullPath;
-					customCharaFileInfo.FileName = folderAssist.lstFile[i].FileName;
-					customCharaFileInfo.time = folderAssist.lstFile[i].time;
-					customCharaFileInfo.isChangeParameter = chaFileControl.gameinfo2.isChangeParameter;
-					customCharaFileInfo.trait = (int)chaFileControl.parameter2.trait;
-					customCharaFileInfo.mind = (int)chaFileControl.parameter2.mind;
-					customCharaFileInfo.hAttribute = (int)chaFileControl.parameter2.hAttribute;
-					customCharaFileInfo.futanari = chaFileControl.parameter.futanari;
-					customCharaFileInfo.cateKind = charaCategoryKind | charaCategoryKind2;
-					customCharaFileInfo.data_uuid = chaFileControl.dataID;
-					customCharaFileInfo.isInSaveData = _isFindSaveData && SaveData.IsRoomListChara(folderAssist.lstFile[i].FileName);
 
-					_list.Add(customCharaFileInfo);
+					
+					_list.Add(new CustomCharaFileInfo()
+					{
+
+						index = idx++,
+						name = chaFileControl.parameter.fullname,
+						personality = text,
+						voice = chaFileControl.parameter2.personality,
+						height = chaFileControl.custom.GetHeightKind(),
+						bustSize = chaFileControl.custom.GetBustSizeKind(),
+						hair = chaFileControl.custom.hair.kind,
+						birthMonth = (int)chaFileControl.parameter.birthMonth,
+						birthDay = (int)chaFileControl.parameter.birthDay,
+						strBirthDay = ChaFileDefine.GetBirthdayStr((int)chaFileControl.parameter.birthMonth, (int)chaFileControl.parameter.birthDay, Singleton<GameSystem>.Instance.language),
+						sex = (int)chaFileControl.parameter.sex,
+						FullPath = folderAssist.lstFile[i].FullPath,
+						FileName = folderAssist.lstFile[i].FileName,
+						time = folderAssist.lstFile[i].time,
+						isChangeParameter = chaFileControl.gameinfo2.isChangeParameter,
+						trait = (int)chaFileControl.parameter2.trait,
+						mind = (int)chaFileControl.parameter2.mind,
+						hAttribute = (int)chaFileControl.parameter2.hAttribute,
+						futanari = chaFileControl.parameter.futanari,
+						cateKind = charaCategoryKind | charaCategoryKind2,
+						data_uuid = chaFileControl.dataID,
+						isInSaveData = _isFindSaveData && SaveData.IsRoomListChara(folderAssist.lstFile[i].FileName),
+
+					});
 				}
 
 			}

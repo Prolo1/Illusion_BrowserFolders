@@ -73,7 +73,7 @@ namespace BrowserFolders.Hooks
         internal static void InitHook(CustomCharaFile __instance)
         {
             var instance = CustomBase.Instance;
-            _folderTreeView.DefaultPath = Path.Combine(Utils.NormalizePath(UserData.Path), instance.modeSex != 0 ? @"chara/female/" : "chara/male");
+            _folderTreeView.DefaultPath = Path.Combine(Utils.NormalizePath(UserData.Path), instance.modeSex != 0 ? "chara/female/" : "chara/male");
             _folderTreeView.CurrentFolder = _folderTreeView.DefaultPath;
 
             _customCharaFile = __instance;

@@ -331,3 +331,6 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 /src/lib
+HS2_BrowserFolders/
+AI_BrowserFolders/
+KKS_BrowserFolders/
